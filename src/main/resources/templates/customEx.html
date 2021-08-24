@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+    <form action="/addFixCheck" method="post" id="checkForm">
+        <div>
+            <label>고정 확장자</label>
+            <input type="hidden" name="checkType" value="fixed">
+            <input type="checkbox" name="checkPick" value="bat" id="bat"> bat
+            <input type="checkbox" name="checkPick" value="cmd" id="cmd"> cmd
+            <input type="checkbox" name="checkPick" value="com" id="com"> com
+            <input type="checkbox" name="checkPick" value="cpi" id="cpi"> cpi
+            <input type="checkbox" name="checkPick" value="exe" id="exe"> exe
+            <input type="checkbox" name="checkPick" value="js" id="js"> js
+
+            <input type="hidden" name="checkValue" id="checkValue">
+        </div>
+<!--        <button type="submit" id="getValue">갑가져오기</button>-->
+    </form>
+    <form action="/addAddCheck" method="post">
+        <label>커스텀 확장자</label>
+        <input type="hidden" name="checkType" value="custom">
+        <input type="text" name="checkValue">
+        <button type="submit">추가</button>
+    </form>
+
+
+    <div style="width: 500px; height: 300px; border: 1px solid gray;">
+        <div th:text="${count} +'/ 200'"></div><br>
+        <th:block th:each="num : ${data2}">
+            <span th:text="${num.checkValue}"></span>
+            <a th:href="@{/delCustom(val=${num.checkValue})}">X</a>
+        </th:block>
+    </div>
+
+
+    <script th:inline="javascript">
+        <!--    h2 데이터 베이스에서 가져온 값으로 checkbox checked 처리    -->
+        /*<![CDATA[*/
+        const query = [[${data}]];
+        for(let i=0; i<query.length; i++){
+            $('input:checkbox[id='+query[i].checkValue+']').attr("checked", true);
+        }
+        /*]]>*/
+    </script>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function(){
+        // check 여부에 따하 추가 또는 삭제 처리 (고정 확장자만)
+        $('input[name="checkPick"]').change(function() {
+            if($(this).is(":checked")){
+                $("#checkValue").val($(this).val())
+                $("#checkForm").attr("action", "/addFixCheck");
+                $("#checkForm").submit();
+            }else if(!$(this).is(":checked")){
+                $("#checkValue").val($(this).val())
+                $("#checkForm").attr("action", "/delFixCheck");
+                $("#checkForm").submit();
+            }
+        });
+
+    });
+</script>
