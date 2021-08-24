@@ -5,67 +5,128 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 </head>
+<style>
+    .txt_border { border: 1px solid #bdb8b8; border-radius: 7px; margin-bottom: 3px;  }
+    .txt_hidden{
+        float: left;
+        width: 70px;
+        padding: 0 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
 <body>
-    <form action="/addFixCheck" method="post" id="checkForm">
-        <div>
-            <label>고정 확장자</label>
-            <input type="hidden" name="checkType" value="fixed">
-            <input type="checkbox" name="checkPick" value="bat" id="bat"> bat
-            <input type="checkbox" name="checkPick" value="cmd" id="cmd"> cmd
-            <input type="checkbox" name="checkPick" value="com" id="com"> com
-            <input type="checkbox" name="checkPick" value="cpi" id="cpi"> cpi
-            <input type="checkbox" name="checkPick" value="exe" id="exe"> exe
-            <input type="checkbox" name="checkPick" value="js" id="js"> js
+    <div class="container">
+        <br>
+        <form action="/addFixCheck" method="post" id="checkForm">
+            <div>
+                <label>고정 확장자</label>
+                <input type="hidden" name="checkType" value="fixed">
+                <input type="checkbox" name="checkPick" value="bat" id="bat"> bat
+                <input type="checkbox" name="checkPick" value="cmd" id="cmd"> cmd
+                <input type="checkbox" name="checkPick" value="com" id="com"> com
+                <input type="checkbox" name="checkPick" value="cpl" id="cpl"> cpl
+                <input type="checkbox" name="checkPick" value="exe" id="exe"> exe
+                <input type="checkbox" name="checkPick" value="scr" id="scr"> scr
+                <input type="checkbox" name="checkPick" value="js" id="js"> js
 
-            <input type="hidden" name="checkValue" id="checkValue">
+                <input type="hidden" name="checkValue" id="checkValue">
+            </div>
+        <br>
+        </form>
+        <form action="/addAddCheck" method="post" onsubmit="return form_submit();" class="form-inline">
+            <div class="form-group">
+                <label for="customEx">커스텀 확장자</label>
+                <input type="hidden" name="checkType" value="custom">
+                <input type="text" name="checkValue" id="customEx" value="" maxlength="20" class="form-control" placeholder="확장자 입력" oninput="handleOnInput(this)" >
+                <button type="submit" class="btn btn-default"><i class="fa fa-plus"></i>추가</button>
+            </div>
+        </form>
+        <br>
+
+
+        <div style="width: 500px; height: 600px; border: 1px solid gray; border-radius: 10px; padding: 15px;">
+            <div th:text="${count} +' / 200'"></div><br>
+            <th:block th:each="num : ${data2}">
+                <div class="full-left col-sm-3 txt_border">
+                    <span th:text="${num.checkValue}" class="txt_hidden"> </span>
+                    <a th:href="@{/delCustom(val=${num.checkValue})}" style="float: right;"><i class="fa fa-times"></i></a>
+                </div>
+            </th:block>
         </div>
-<!--        <button type="submit" id="getValue">갑가져오기</button>-->
-    </form>
-    <form action="/addAddCheck" method="post">
-        <label>커스텀 확장자</label>
-        <input type="hidden" name="checkType" value="custom">
-        <input type="text" name="checkValue">
-        <button type="submit">추가</button>
-    </form>
 
 
-    <div style="width: 500px; height: 300px; border: 1px solid gray;">
-        <div th:text="${count} +'/ 200'"></div><br>
-        <th:block th:each="num : ${data2}">
-            <span th:text="${num.checkValue}"></span>
-            <a th:href="@{/delCustom(val=${num.checkValue})}">X</a>
-        </th:block>
+        <script th:inline="javascript">
+            <!--    h2 데이터 베이스에서 가져온 값으로 checkbox checked 처리    -->
+            /*<![CDATA[*/
+            const query = [[${data}]];
+            for(let i=0; i<query.length; i++){
+                $('input:checkbox[id='+query[i].checkValue+']').attr("checked", true);
+            }
+            /*]]>*/
+
+
+
+
+        </script>
     </div>
-
-
-    <script th:inline="javascript">
-        <!--    h2 데이터 베이스에서 가져온 값으로 checkbox checked 처리    -->
-        /*<![CDATA[*/
-        const query = [[${data}]];
-        for(let i=0; i<query.length; i++){
-            $('input:checkbox[id='+query[i].checkValue+']').attr("checked", true);
-        }
-        /*]]>*/
-    </script>
-
 </body>
 </html>
 
 <script>
     $(document).ready(function(){
+
+        $("#customEx").focus();
+        const selector = $("#checkForm");
         // check 여부에 따하 추가 또는 삭제 처리 (고정 확장자만)
         $('input[name="checkPick"]').change(function() {
             if($(this).is(":checked")){
                 $("#checkValue").val($(this).val())
-                $("#checkForm").attr("action", "/addFixCheck");
-                $("#checkForm").submit();
+                selector.attr("action", "/addFixCheck");
+                selector.submit();
             }else if(!$(this).is(":checked")){
                 $("#checkValue").val($(this).val())
-                $("#checkForm").attr("action", "/delFixCheck");
-                $("#checkForm").submit();
+                selector.attr("action", "/delFixCheck");
+                selector.submit();
             }
         });
-
     });
+
+    function form_submit(){
+
+        var isValid = true;
+        $('input:checkbox[name=checkPick]').each(function() { // 체크박스의 value 값을 가지고 온다.
+            if($("#customEx").val() === $(this).val()) {
+                alert("고정확장자에 해당하는 값입니다. 고정확장자를 체크해주세요.");
+                $("#customEx").focus();
+                isValid = false;
+                return false;
+            }
+        });
+        return isValid;
+        if($("#customEx").val() === ""){
+            alert("확장자를 입력해주세요.");
+            $("#customEx").focus();
+            return false;
+        }
+
+
+        const cnt = [[${count}]];
+        if(cnt >= 200){
+            alert("커스텀 확장자는 200개 이상 초과하실수 없습니다.");
+            return false;
+        }
+    }
+
+    function handleOnInput(e)  {
+        e.value = e.value.replace(/[^A-Za-z]/ig, '')
+    }
+
+
 </script>

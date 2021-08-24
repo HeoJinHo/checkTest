@@ -17,6 +17,7 @@ public class HomeController
 
     private final CheckDataSv checkDataSv;
 
+    //타입별 확장 저장된 확장자 조회
     @RequestMapping("/")
     public ModelAndView custom(){
         ModelAndView mv = new ModelAndView();
@@ -28,24 +29,28 @@ public class HomeController
     }
 
 
+    // 고정확장자 추가
     @RequestMapping("/addFixCheck")
     public String addCheck(CheckData checkData){
         checkDataSv.insertCheckData(checkData);
         return "redirect:/";
     }
 
+    // 고정확장자 제거
     @RequestMapping("/delFixCheck")
     public String delCheck(CheckData checkData){
         checkDataSv.deleteCheckData(checkData);
         return "redirect:/";
     }
 
+    // 커스텀 확장자 추가
     @RequestMapping("/addAddCheck")
     public String addAddCheck(CheckData checkData){
         checkDataSv.insertCheckData(checkData);
         return "redirect:/";
     }
 
+    // 커스텀 확장자 제거
     @GetMapping("/delCustom")
     public String delCustom(String val){
         checkDataSv.delCustomData(val);
